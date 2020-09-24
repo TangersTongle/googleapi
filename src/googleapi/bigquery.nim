@@ -1,5 +1,5 @@
 import json, os, strformat, streams, asyncdispatch
-import connection, print
+import connection
 
 const bqRoot = "https://www.googleapis.com/bigquery/v2"
 
@@ -171,13 +171,13 @@ when isMainModule:
 
     block:
       for ds in await conn.getDatasets("your-project"):
-          print ds.datasetReference.datasetId, ds.location
+          echo ds.datasetReference.datasetId, ds.location
           for tb in await conn.getTables("your-project", ds.datasetReference.datasetId):
-            print "    ", tb.tableReference.tableId
+            echo "    ", tb.tableReference.tableId
 
     block:
       let jobId = await conn.insertQueryJob("your-project", "select 1")
-      print jobId
+      echo jobId
       while true:
         let resultsJson = await conn.pollQueryJob("your-project", jobId)
         echo pretty resultsJson
@@ -186,7 +186,7 @@ when isMainModule:
 
     block:
       let jobId = await conn.insertQueryJob("your-project", "select 1")
-      print jobId
+      echo jobId
       let resultsJson = await conn.cancelQueryJob("your-project", jobId)
       echo pretty resultsJson
 

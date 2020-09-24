@@ -1,6 +1,5 @@
 import json, times, httpclient, asyncdispatch, cgi, json, os, strformat,
   streams, jwt
-import print
 
 const bqRoot = "https://www.googleapis.com/bigquery/v2"
 
@@ -89,6 +88,18 @@ proc getAuthToken*(conn: Connection): Future[string] {.async.} =
   conn.authTokenExpireTime = float64(epochTime() + 60 * 60)
 
   return conn.authToken
+
+proc getAsString*(conn: Connection, url: string):
+    Future[string] {.async.} =
+  ## Generic get request
+  var client = newAsyncHttpClient()
+  client.headers = newHttpHeaders({
+    "Authorization": "Bearer " & await conn.getAuthToken(),
+    "Content-Type": "application/json"
+  })
+  let resp = await client.get(url)
+  result = await resp.bodyStream.readAll()
+  client.close()
 
 
 proc get*(conn: Connection, url: string):

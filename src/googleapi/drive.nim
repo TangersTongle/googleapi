@@ -1,6 +1,6 @@
 
 import json, os, strformat, streams, asyncdispatch, uri, strutils
-import connection, print
+import connection
 
 const driveRoot = "https://www.googleapis.com/drive/v3"
 
@@ -10,6 +10,15 @@ proc list*(conn: Connection, q: string): Future[JsonNode] {.async.} =
 proc list*(conn: Connection, q: string, fields: seq[string]): Future[JsonNode] {.async.} =
   let fieldsStr = encodeUrl(fields.join(","))
   return await conn.get(&"{driveRoot}/files?q={encodeUrl(q)}&fields={fieldsStr}")
+
+proc exportFile*(
+  conn: Connection,
+  documentId: string,
+  mimeType: string
+): Future[string] {.async.} =
+  return await conn.getAsString(
+    &"{driveRoot}/files/{documentId}/export?mimeType={encodeUrl(mimeType)}"
+  )
 
 when isMainModule:
 
